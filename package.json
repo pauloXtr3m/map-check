@@ -39,6 +39,7 @@
     "react-native-svg": "^12.1.0",
     "react-native-vector-icons": "^7.1.0",
     "styled-components": "^5.2.1",
+    "uuidv4": "^5.0.1",
     "yup": "^0.32.8"
   },
   "devDependencies": {

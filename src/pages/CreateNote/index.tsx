@@ -9,7 +9,6 @@ import {
   Alert,
   Platform,
   ScrollView,
-  View,
   KeyboardAvoidingView,
 } from 'react-native';
 import { Container, RowBottom } from './styles';
@@ -41,7 +40,7 @@ const CreateNote: React.FC = () => {
         await schema.validate(data, { abortEarly: false });
 
         await save(data.note);
-        // save note
+        goBack();
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);

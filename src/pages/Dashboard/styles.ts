@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { Platform, Text } from 'react-native';
+import { Platform, Text, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Row } from '../../components/Row';
 
@@ -13,6 +13,10 @@ export const Container = styled.View`
     ${Platform.OS === 'android' ? 150 : 40}px;
 `;
 
+export const ContainerLoading = styled(Container)`
+  justify-content: space-evenly;
+`;
+
 export const MapContainer = styled(MapView)`
   position: absolute;
   top: 0;
@@ -21,9 +25,21 @@ export const MapContainer = styled(MapView)`
   bottom: 0;
 `;
 
-export const Footnote = styled(Text)`
+export const Annotation = styled(Text)`
+  flex-shrink: 1;
+  flex-direction: row;
   font-size: 10px;
-  color: gray;
+  padding: 4px;
+  margin-left: 8px;
+  background-color: #e5e5e5;
+  overflow: hidden;
+  border-radius: 6px;
+`;
+
+export const Footnote = styled(Text)`
+  margin-left: 6px;
+  font-size: 9px;
+  color: #585858;
 `;
 
 export const RowBottom = styled(Row)`
@@ -32,4 +48,12 @@ export const RowBottom = styled(Row)`
   margin-bottom: 20%;
   width: 90%;
   bottom: 0;
+`;
+
+export const MarkerDetail = styled(View)`
+  flex-shrink: 1;
+  justify-content: space-around;
+  align-items: flex-start;
+  min-height: 100px;
+  padding: 8px;
 `;

@@ -43,7 +43,7 @@ export const LocationProvider: React.FC = ({ children }) => {
       setInit(true);
       getCurrentLocation();
     }
-  }, [init, setInit, getCurrentLocation]);
+  }, [init, setInit]);
 
   const getCurrentLocation = useCallback(async () => {
     try {
