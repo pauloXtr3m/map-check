@@ -8,9 +8,12 @@ import React, {
 import AsyncStorage from '@react-native-community/async-storage';
 import { Alert } from 'react-native';
 import * as Datefns from 'date-fns';
+import uuidv4 from 'uuidv4';
 import { useLocation } from './location';
+import api from '../services/api';
 
 export interface Note {
+  id: string;
   latitude: number;
   longitude: number;
   annotation: string;
@@ -53,8 +56,6 @@ export const NotesProvider: React.FC = ({ children }) => {
   const save = useCallback(
     async (note: string) => {
       setLoading(true);
-      console.log(note);
-      console.log(location);
       if (!location || !location.latitude || !location.longitude) {
         Alert.alert(
           'Sem acesso a localização',
@@ -73,6 +74,7 @@ export const NotesProvider: React.FC = ({ children }) => {
         );
 
         const annotation: Note = {
+          id: uuidv4(),
           latitude,
           longitude,
           annotation: note,
@@ -98,7 +100,39 @@ export const NotesProvider: React.FC = ({ children }) => {
     [data, location],
   );
 
-  const sync = useCallback(async () => {}, []);
+  const sync = useCallback(async () => {
+    setLoading(true);
+    const notesToSync = data.filter(note => !note.sync);
+
+    const promisesSendNotes = notesToSync.map(async note => {
+      const dataNote = { ...note, id: undefined, sync: undefined };
+
+      return api.post('/', dataNote);
+    });
+
+    const newArray = [...data];
+
+    const promisesSave = notesToSync.map(async note => {
+      const index = data.indexOf(note);
+      const newNote = { ...note, sync: true };
+
+      newArray[index] = newNote;
+      setData(newArray);
+
+      return AsyncStorage.setItem('@Mapcheck:notes', JSON.stringify(newArray));
+    });
+
+    try {
+      await Promise.all(promisesSendNotes);
+
+      await Promise.all(promisesSave);
+    } catch (e) {
+      Alert.alert('Erro', 'Não foi possível salvar a nota, tente novamente');
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  }, [data]);
 
   return (
     <Notes.Provider

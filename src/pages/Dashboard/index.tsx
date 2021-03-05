@@ -2,19 +2,45 @@ import React from 'react';
 import { Callout, Marker } from 'react-native-maps';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import { View } from 'react-native';
-import { Container, MapContainer, RowBottom, Footnote } from './styles';
+import { ActivityIndicator, View } from 'react-native';
+import * as Datefns from 'date-fns';
+import {
+  Container,
+  MapContainer,
+  RowBottom,
+  Footnote,
+  MarkerDetail,
+  Annotation,
+  ContainerLoading,
+} from './styles';
 import { colors } from '../../styles/colors';
 import { ActionButton } from '../../components/ActionButton';
 import { useLocation } from '../../hooks/location';
 import { useNotes } from '../../hooks/notes';
-import TextSubtitle from '../../components/TextSubtitle';
 import { Row } from '../../components/Row';
+import TextTitle from '../../components/TextTitle';
 
 const Dashboard: React.FC = () => {
   const { navigate } = useNavigation();
   const { location } = useLocation();
-  const { notes, sync } = useNotes();
+  const { notes, sync, loading } = useNotes();
+
+  const fromStringToDate = datetime =>
+    Datefns.parse(datetime, 'yyyy-MM-dd HH:mm:ss', new Date());
+
+  if (loading) {
+    return (
+      <ContainerLoading>
+        <Row center>
+          <TextTitle>Sincronização em andamento</TextTitle>
+        </Row>
+        <Row center>
+          <ActivityIndicator />
+        </Row>
+      </ContainerLoading>
+    );
+  }
+
   return (
     <Container>
       <MapContainer
@@ -27,35 +53,55 @@ const Dashboard: React.FC = () => {
       >
         {notes.map(note => (
           <Marker
+            key={note.id}
             coordinate={{ latitude: note.latitude, longitude: note.longitude }}
             pinColor={note.sync ? 'gray' : 'green'}
           >
             <Callout>
-              <View style={{ minHeight: 100 }}>
-                <Row>
+              <MarkerDetail>
+                <View style={{ flexDirection: 'row', flexShrink: 1 }}>
                   <Icon name="book" />
-                  <TextSubtitle>{note.annotation}</TextSubtitle>
-                </Row>
-                <Row>
-                  <Icon name="clock" />
-                  <Footnote>{note.datetime}</Footnote>
-                </Row>
-                <Row>
-                  <Icon name="map" />
-                  <View>
-                    <Footnote>{`lat: ${note.latitude}`}</Footnote>
-                  </View>
-                  <View>
-                    <Footnote>{`lat: ${note.longitude}`}</Footnote>
-                  </View>
-                </Row>
-              </View>
+                  <Annotation>{note.annotation}</Annotation>
+                </View>
+                <View>
+                  <Row full>
+                    <Icon name="calendar" />
+                    <Footnote>
+                      {Datefns.format(
+                        fromStringToDate(note.datetime),
+                        'dd/MM/yyyy',
+                      )}
+                    </Footnote>
+                  </Row>
+                  <Row>
+                    <Icon name="clock" />
+                    <Footnote>
+                      {Datefns.format(
+                        fromStringToDate(note.datetime),
+                        'HH:mm:ss',
+                      )}
+                    </Footnote>
+                  </Row>
+                  <Row>
+                    <Icon name="map" />
+                    <View>
+                      <Footnote>{`lat: ${note.latitude}`}</Footnote>
+                    </View>
+                    <View>
+                      <Footnote>{`lon: ${note.longitude}`}</Footnote>
+                    </View>
+                  </Row>
+                </View>
+              </MarkerDetail>
             </Callout>
           </Marker>
         ))}
       </MapContainer>
       <RowBottom full withSpaceBetween>
-        <ActionButton backgroundColor={colors.accent} onPress={sync}>
+        <ActionButton
+          backgroundColor={colors.accent}
+          onPress={async () => sync()}
+        >
           <Icon name="refresh-cw" size={30} />
         </ActionButton>
         <ActionButton
