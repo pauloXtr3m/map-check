@@ -5,7 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
-import { Alert } from 'react-native';
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  View,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { Container, RowBottom } from './styles';
 import { colors } from '../../styles/colors';
 import TextTitle from '../../components/TextTitle';
@@ -59,23 +65,39 @@ const CreateNote: React.FC = () => {
 
   return (
     <LinearGradient colors={colors.default} style={{ flex: 1 }}>
-      <Container>
-        <TextTitle>Crie a sua anotação</TextTitle>
-        <Form ref={formRef} onSubmit={handleSubmit}>
-          <Input name="note" icon="book-open" multiline numberOfLines={10} />
-        </Form>
-        <RowBottom full withSpaceBetween>
-          <ActionButton backgroundColor="white" onPress={goBack}>
-            <Icon name="arrow-left" size={30} />
-          </ActionButton>
-          <ActionButton
-            backgroundColor={colors.accent}
-            onPress={() => formRef.current?.submitForm()}
-          >
-            <Icon name="save" size={30} />
-          </ActionButton>
-        </RowBottom>
-      </Container>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        enabled
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flex: 1 }}
+        >
+          <Container>
+            <TextTitle>Crie a sua anotação</TextTitle>
+            <Form ref={formRef} onSubmit={handleSubmit}>
+              <Input
+                name="note"
+                icon="book-open"
+                multiline
+                numberOfLines={10}
+              />
+            </Form>
+            <RowBottom full withSpaceBetween>
+              <ActionButton backgroundColor="white" onPress={goBack}>
+                <Icon name="arrow-left" size={30} />
+              </ActionButton>
+              <ActionButton
+                backgroundColor={colors.accent}
+                onPress={() => formRef.current?.submitForm()}
+              >
+                <Icon name="save" size={30} />
+              </ActionButton>
+            </RowBottom>
+          </Container>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
