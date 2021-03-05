@@ -7,6 +7,14 @@ Save annotations in the map
 * Rename `.env.example` file to `.env`
 * Set your email in env file
 
+### Only on Android
+
+Create a Google Maps key and add to
+
+```
+android/app/src/main/AndroidManifest.xml
+```
+
 ### Install dependencies
 
 ```yarn```
