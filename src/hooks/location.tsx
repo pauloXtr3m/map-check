@@ -5,7 +5,6 @@ import React, {
   useContext,
   useEffect,
 } from 'react';
-import AsyncStorage from '@react-native-community/async-storage';
 import Geolocation from '@react-native-community/geolocation';
 import { Alert } from 'react-native';
 
@@ -40,21 +39,11 @@ export const LocationProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadStorageData(): Promise<void> {
-      const [location] = await AsyncStorage.multiGet(['@Weatherfy:location']);
-
-      if (location[1]) {
-        setData({ location: JSON.parse(location[1]) });
-      }
-
-      setLoading(false);
-    }
-
     if (!init) {
       setInit(true);
-      loadStorageData();
+      getCurrentLocation();
     }
-  }, [init, setInit]);
+  }, [init, setInit, getCurrentLocation]);
 
   const getCurrentLocation = useCallback(async () => {
     try {
@@ -64,16 +53,12 @@ export const LocationProvider: React.FC = ({ children }) => {
           setLoading(true);
 
           const location: Location = { latitude, longitude };
-          await AsyncStorage.multiSet([
-            ['@Weatherfy:location', JSON.stringify(location)],
-          ]);
           setData({ location });
-
           setLoading(false);
         },
       );
     } catch (e) {
-      Alert.alert('Sem conexão', 'Não foi possível buscar a localização');
+      Alert.alert('Erro', 'Não foi possível buscar a localização');
       console.log(e);
     }
   }, []);

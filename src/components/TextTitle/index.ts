@@ -7,7 +7,6 @@ interface TextProps {
 
 const TextTitle = styled.Text<TextProps>`
   font-size: 26px;
-  color: #fff;
   ${props => (props.opacity ? `opacity: ${props.opacity};` : '')}
   ${props => (props.fontWeight ? `font-weight: ${props.fontWeight};` : '')}
 `;
